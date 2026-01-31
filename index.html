@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .animated-gradient {
+            background: linear-gradient(-45deg, #000000, #1a1a1a, #0a0a0a, #262626);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .notification-enter {
+            animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .notification-exit {
+            animation: slideOut 0.3s ease-out;
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .glass-effect {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .social-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="animated-gradient min-h-screen flex items-center justify-center p-4">
+    <div id="notifications" class="fixed top-6 right-6 z-50 space-y-3 max-w-md"></div>
+    
+    <div class="w-full max-w-md">
+        <div class="text-center mb-6 fade-in">
+            <h1 class="text-3xl font-bold text-white mb-2">Welcome</h1>
+            <p class="text-gray-400 text-sm">Sign in to continue</p>
+        </div>
+        
+        <div class="glass-effect rounded-3xl shadow-2xl p-6">
+            <div class="flex gap-2 p-1 bg-black/30 rounded-xl mb-6">
+                <button onclick="switchTab('login')" id="loginTab" 
+                    class="flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 bg-white text-black">
+                    Sign In
+                </button>
+                <button onclick="switchTab('register')" id="registerTab" 
+                    class="flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 text-gray-400 hover:text-white">
+                    Sign Up
+                </button>
+            </div>
+            
+            <div id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <input type="email" id="loginEmail" 
+                        class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all" 
+                        placeholder="you@example.com">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <input type="password" id="loginPassword" 
+                        class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all" 
+                        placeholder="Enter password">
+                </div>
+                
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" class="w-4 h-4 rounded">
+                        <span class="ml-2 text-gray-400">Remember me</span>
+                    </label>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Forgot password?</a>
+                </div>
+                
+                <button onclick="handleLogin()" id="loginBtn" 
+                    class="btn-primary w-full py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
+                    <svg id="loginSpinner" class="w-5 h-5 spinner hidden" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="loginBtnText">Sign In</span>
+                </button>
+                
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-700"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-transparent text-gray-500">Or continue with</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="socialLogin('Google')" class="social-btn p-3 bg-black/40 border border-gray-700 rounded-xl hover:border-white transition-all flex items-center justify-center">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                    </button>
+                    <button onclick="socialLogin('GitHub')" class="social-btn p-3 bg-black/40 border border-gray-700 rounded-xl hover:border-white transition-all flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </button>
+                    <button onclick="socialLogin('Apple')" class="social-btn p-3 bg-black/40 border border-gray-700 rounded-xl hover:border-white transition-all flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="registerForm" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                    <input type="text" id="registerName" 
+                        class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all" 
+                        placeholder="John Doe">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <input type="email" id="registerEmail" 
+                        class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all" 
+                        placeholder="you@example.com">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <input type="password" id="registerPassword" 
+                        class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all" 
+                        placeholder="Create password">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                    <input type="password" id="registerConfirm" 
+                        class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all" 
+                        placeholder="Confirm password">
+                </div>
+                
+                <label class="flex items-start cursor-pointer">
+                    <input type="checkbox" id="terms" class="w-4 h-4 mt-1 rounded">
+                    <span class="ml-3 text-sm text-gray-400">
+                        I agree to the <a href="#" class="text-white hover:underline">Terms</a> and <a href="#" class="text-white hover:underline">Privacy Policy</a>
+                    </span>
+                </label>
+                
+                <button onclick="handleRegister()" id="registerBtn" 
+                    class="btn-primary w-full py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
+                    <svg id="registerSpinner" class="w-5 h-5 spinner hidden" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="registerBtnText">Create Account</span>
+                </button>
+                
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-700"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-transparent text-gray-500">Or continue with</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="socialLogin('Google')" class="social-btn p-3 bg-black/40 border border-gray-700 rounded-xl hover:border-white transition-all flex items-center justify-center">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                    </button>
+                    <button onclick="socialLogin('GitHub')" class="social-btn p-3 bg-black/40 border border-gray-700 rounded-xl hover:border-white transition-all flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </button>
+                    <button onclick="socialLogin('Apple')" class="social-btn p-3 bg-black/40 border border-gray-700 rounded-xl hover:border-white transition-all flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4 fade-in">
+            <p class="text-gray-400 text-sm">
+                <span id="footerText">Don't have an account?</span>
+                <button onclick="toggleForm()" id="footerBtn" class="text-white font-semibold hover:underline ml-1">Sign Up</button>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notifications');
+            const notification = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            notification.className = `notification-enter flex items-center gap-3 p-4 bg-zinc-900/95 backdrop-blur-lg border border-gray-800 rounded-2xl shadow-2xl min-w-[300px]`;
+            notification.innerHTML = `
+                <div class="${colors[type]} w-2 h-12 rounded-full"></div>
+                <p class="text-white text-sm font-medium flex-1">${message}</p>
+                <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white">×</button>
+            `;
+            
+            container.appendChild(notification);
+            setTimeout(() => {
+                notification.classList.add('notification-exit');
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+        
+        function setLoading(type, loading) {
+            const spinner = document.getElementById(`${type}Spinner`);
+            const text = document.getElementById(`${type}BtnText`);
+            const btn = document.getElementById(`${type}Btn`);
+            
+            if (loading) {
+                spinner.classList.remove('hidden');
+                text.textContent = 'Please wait...';
+                btn.disabled = true;
+                btn.classList.add('opacity-75');
+            } else {
+                spinner.classList.add('hidden');
+                text.textContent = type === 'login' ? 'Sign In' : 'Create Account';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }
+        }
+        
+        function switchTab(tab) {
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const footerText = document.getElementById('footerText');
+            const footerBtn = document.getElementById('footerBtn');
+
+            if (tab === 'login') {
+                loginTab.classList.add('bg-white', 'text-black');
+                loginTab.classList.remove('text-gray-400');
+                registerTab.classList.remove('bg-white', 'text-black');
+                registerTab.classList.add('text-gray-400');
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                footerText.textContent = "Don't have an account?";
+                footerBtn.textContent = "Sign Up";
+            } else {
+                registerTab.classList.add('bg-white', 'text-black');
+                registerTab.classList.remove('text-gray-400');
+                loginTab.classList.remove('bg-white', 'text-black');
+                loginTab.classList.add('text-gray-400');
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                footerText.textContent = "Already have an account?";
+                footerBtn.textContent = "Sign In";
+            }
+        }
+        
+        function toggleForm() {
+            const loginForm = document.getElementById('loginForm');
+            switchTab(loginForm.classList.contains('hidden') ? 'login' : 'register');
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            setLoading('login', true);
+            await new Promise(r => setTimeout(r, 1500));
+            setLoading('login', false);
+            showNotification('Login successful! Welcome back.', 'success');
+        }
+
+        async function handleRegister() {
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const terms = document.getElementById('terms').checked;
+
+            if (!name || !email || !password || !confirm) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (password !== confirm) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+
+            if (!terms) {
+                showNotification('Please accept the terms', 'warning');
+                return;
+            }
+
+            setLoading('register', true);
+            await new Promise(r => setTimeout(r, 2000));
+            setLoading('register', false);
+            showNotification('Account created successfully!', 'success');
+        }
+
+        function socialLogin(provider) {
+            showNotification(`Connecting to ${provider}...`, 'info');
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            ['loginEmail', 'loginPassword'].forEach(id => {
+                document.getElementById(id).addEventListener('keypress', e => {
+                    if (e.key === 'Enter') handleLogin();
+                });
+            });
+            
+            ['registerName', 'registerEmail', 'registerPassword', 'registerConfirm'].forEach(id => {
+                document.getElementById(id).addEventListener('keypress', e => {
+                    if (e.key === 'Enter') handleRegister();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
